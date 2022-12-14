@@ -1,0 +1,10 @@
+D:\Software Development\Personal Projects\Battleship\Battleship\obj\Debug\Battleship.csprojAssemblyReference.cache
+D:\Software Development\Personal Projects\Battleship\Battleship\obj\Debug\Battleship.Form1.resources
+D:\Software Development\Personal Projects\Battleship\Battleship\obj\Debug\Battleship.Properties.Resources.resources
+D:\Software Development\Personal Projects\Battleship\Battleship\obj\Debug\Battleship.csproj.GenerateResource.cache
+D:\Software Development\Personal Projects\Battleship\Battleship\obj\Debug\Battleship.csproj.CoreCompileInputs.cache
+D:\Software Development\Personal Projects\Battleship\Battleship\bin\Debug\Battleship.exe.config
+D:\Software Development\Personal Projects\Battleship\Battleship\bin\Debug\Battleship.exe
+D:\Software Development\Personal Projects\Battleship\Battleship\bin\Debug\Battleship.pdb
+D:\Software Development\Personal Projects\Battleship\Battleship\obj\Debug\Battleship.exe
+D:\Software Development\Personal Projects\Battleship\Battleship\obj\Debug\Battleship.pdb
