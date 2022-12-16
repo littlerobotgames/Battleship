@@ -1,0 +1,11 @@
+C:\Users\alex\OneDrive\Documents\Visual Studio 2022\Battleship\Battleship\obj\Debug\Battleship.csproj.AssemblyReference.cache
+C:\Users\alex\OneDrive\Documents\Visual Studio 2022\Battleship\Battleship\obj\Debug\Battleship.csproj.SuggestedBindingRedirects.cache
+C:\Users\alex\OneDrive\Documents\Visual Studio 2022\Battleship\Battleship\obj\Debug\Battleship.Form1.resources
+C:\Users\alex\OneDrive\Documents\Visual Studio 2022\Battleship\Battleship\obj\Debug\Battleship.Properties.Resources.resources
+C:\Users\alex\OneDrive\Documents\Visual Studio 2022\Battleship\Battleship\obj\Debug\Battleship.csproj.GenerateResource.cache
+C:\Users\alex\OneDrive\Documents\Visual Studio 2022\Battleship\Battleship\obj\Debug\Battleship.csproj.CoreCompileInputs.cache
+C:\Users\alex\OneDrive\Documents\Visual Studio 2022\Battleship\Battleship\bin\Debug\Battleship.exe.config
+C:\Users\alex\OneDrive\Documents\Visual Studio 2022\Battleship\Battleship\bin\Debug\Battleship.exe
+C:\Users\alex\OneDrive\Documents\Visual Studio 2022\Battleship\Battleship\bin\Debug\Battleship.pdb
+C:\Users\alex\OneDrive\Documents\Visual Studio 2022\Battleship\Battleship\obj\Debug\Battleship.exe
+C:\Users\alex\OneDrive\Documents\Visual Studio 2022\Battleship\Battleship\obj\Debug\Battleship.pdb

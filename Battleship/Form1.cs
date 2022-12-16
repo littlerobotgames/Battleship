@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -12,22 +13,25 @@ namespace Battleship
 {
     public partial class Form1 : Form
     {
-        public int Tsize = 16;
-        public int Tscale = 4;
-        public int TWidth = 7;
-        public int THeight = 7;
+        public int Tbase = 16;
+        public int Tscale = 2;
+        public int Tsize = 0;
+
+        static public int TWidth = 10;
+        static public int THeight = 10;
+
+        public int placing_dir = 0;
 
         stages stage = stages.None;
 
         //Set base ship info
-        ShipData[] ships = { new ShipData("Carrier", 5),
-                             new ShipData("Battleship", 4),
-                             new ShipData("Destroyer", 3),
-                             new ShipData("Submarine", 3),
-                             new ShipData("Patrol Boat", 2) };
+        static ShipData[] allships = { new ShipData("Carrier", 5, "spr_carrier.png"),
+                             new ShipData("Battleship", 4, "spr_battleship.png"),
+                             new ShipData("Destroyer", 3, "spr_destroyer.png"),
+                             new ShipData("Submarine", 3, "spr_submarine.png"),
+                             new ShipData("Patrol Boat", 2, "spr_patrol.png") };
 
-        Player[] players = { new Player(true), new Player(false) };
-        int placing_ship = 0;
+        Player[] players = { new Human(TWidth, THeight), new Bot(TWidth, THeight, ref allships) };
         int turn = 0;
 
         public Form1()
@@ -42,9 +46,8 @@ namespace Battleship
             Finished
         }
         private void Form1_Load(object sender, EventArgs e)
-        { 
-            bool[] ships_placed = { false, false, false, false, false };
-
+        {
+            Tsize = Tbase * Tscale;
             NextStage();
 
             /*Stages:
@@ -53,7 +56,6 @@ namespace Battleship
              * 2 = InGame
              * 3 = Finished
              */
-
             
         }
         private void NextStage()
@@ -69,14 +71,18 @@ namespace Battleship
 
                     LabelInfo.Text = "";
 
-                    for(int i=0; i<ships.Length; i++)
+                    for(int i=0; i<allships.Length; i++)
                     {
-                        LabelInfo.Text += $"{ships[i].Name}\n";
+                        LabelInfo.Text += $"{allships[i].Name}\n";
                     }
                     break;
                 case stages.InGame:
                     LabelObjective.Text = "Destroy the Enemy";
                     LabelInfo.Text = "";
+
+                    Bot bot = (Bot)players[1];
+                    bot.PlaceShips();
+                    Refresh();
                     break;
                 case stages.Finished:
                     break;
@@ -91,124 +97,177 @@ namespace Battleship
                 turn = 0;
             }
         }
-
-        private void GuessMap_Click(object sender, EventArgs e)
+        static public Point GetDirPoints(int dir)
+        {
+            Point p;
+            switch (dir)
+            {
+                case 0:
+                    p = new Point(1, 0);
+                    break;
+                case 1:
+                    p = new Point(0, -1);
+                    break;
+                case 2:
+                    p = new Point(-1, 0);
+                    break;
+                case 3:
+                    p = new Point(0, 1);
+                    break;
+                default:
+                    p = new Point(0, 0);
+                    break;
+            }
+            return p;
+        }
+        private void MainMap_Click(object sender, EventArgs e)
         {
             MouseEventArgs me = (MouseEventArgs)e;
 
             var relativePoint = PointToClient(Cursor.Position);
 
-            int MouseX = relativePoint.X - GuessMap.Location.X;
-            int MouseY = relativePoint.Y - GuessMap.Location.Y;
+            int MouseX = relativePoint.X - MainMap.Location.X;
+            int MouseY = relativePoint.Y - MainMap.Location.Y;
 
-            int CellSize = Tsize * Tscale;
-
-            int GridX = MouseX / CellSize;
-            int GridY = MouseY / CellSize;
+            int GridX = MouseX / Tsize;
+            int GridY = MouseY / Tsize;
 
             Console.WriteLine($"MX: {MouseX}\tMY: {MouseY}");
             Console.WriteLine($"GX: {GridX}\tGY: {GridY}");
 
-            if (me.Button == MouseButtons.Right)
+            if (me.Button == MouseButtons.Left)
             {
-                string writetext = "";
-
-                for (int y = 0; y < THeight; y++)
+                switch (stage)
                 {
-                    for (int x = 0; x < TWidth; x++)
-                    {
-                        if (players[0].HasPart(x, y))
+                    case stages.Place:
+                        Player tempplayer = players[turn];
+                        ShipData tempShip = allships[tempplayer.PlacingShip];
+
+                        if (tempplayer.PlaceShip(new Ship(tempShip.Name, GridX, GridY, placing_dir, tempShip.Size, tempShip.SpritePath)))
                         {
-                            writetext += "O";
+                            Refresh();
+                            tempplayer.PlacingShip++;
+                            placing_dir = 0;
                         }
-                        else
+
+                        if (tempplayer.PlacingShip == 5)
                         {
-                            writetext += " ";
+                            NextStage();
                         }
-                    }
-                    writetext += "\n";
+                        break;
+                    case stages.InGame:
+
+                        break;
+                    case stages.Finished:
+                        break;
                 }
-                Console.WriteLine(writetext);
             }
-
-            switch (stage)
+            else if (me.Button == MouseButtons.Right)
             {
-                case stages.Place:
-                    ShipData tempShip = ships[placing_ship];
-
-                    if (players[turn].PlaceShip(new Ship(tempShip.Name, GridX, GridY, 0, tempShip.Size)))
-                    {
-                        placing_ship++;
-                    }
-
-                    if (placing_ship == 5)
-                    {
-                        NextStage();
-                    }
-                    break;
-                case stages.InGame:
-
-                    break;
-                case stages.Finished:
-                    break;
+                if (placing_dir == 3)
+                {
+                    placing_dir = 0;
+                }
+                else
+                {
+                    placing_dir++;
+                }
+                Console.WriteLine($"Angle is now {placing_dir}");
             }
         }
-        private void GuessMap_Paint(object sender, PaintEventArgs e)
+        private void MainMap_Paint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
-
-            int CellSize = Tsize * Tscale;
+            
+            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
 
             //Draw player ships on main grid while placing
-            if (stage == stages.Place)
-            {
-                Pen p_ship = new Pen(Color.Gray);
+            Pen p_ship = new Pen(Color.Gray);
 
-                for (int y = 0; y < THeight; y++)
+            Player tempplayer = players[0];
+
+            for (int s = 0; s < 5; s++)
                 {
-                    for (int x = 0; x < TWidth; x++)
-                    {
-                        if (players[0].HasPart(x, y))
-                        {
-                            Rectangle rect = new Rectangle((x * CellSize) + 8, (y * CellSize + 8), CellSize - 16, CellSize - 16);
+                Ship tempship = tempplayer.ships[s];
 
-                            g.DrawRectangle(p_ship, rect);
-                        }
+                if (tempship != null)
+                {
+                    g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+                    //g.DrawImage(tempship.Sprite, tempship.X * Tsize, tempship.Y * Tsize);
+
+                    for (int part = 0; part < tempship.Size; part++)
+                    {
+                        ShipPart temppart = tempship.GetPart(part);
+                        int pX = temppart.X;
+                        int pY = temppart.Y;
+
+                        Rectangle rect = new Rectangle((pX * Tsize) + 4, (pY * Tsize + 4), Tsize - 8, Tsize - 8);
+
+                        g.DrawRectangle(p_ship, rect);  
                     }
-                }
+                }                        
             }
 
             //Draw map Grid
             Pen p_grid = new Pen(Color.Black);
+            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.None;
 
-            g.DrawRectangle(p_grid, 0, 0, GuessMap.Width-1, GuessMap.Height-1);
+            g.DrawRectangle(p_grid, 0, 0, MainMap.Width-1, MainMap.Height-1);
 
             for (int y = 1; y < TWidth; y++)
             {
-                g.DrawLine(p_grid, 0, y * CellSize, GuessMap.Height, y * CellSize);
+                g.DrawLine(p_grid, 0, y * Tsize, MainMap.Height, y * Tsize);
             }
             for (int x = 1; x < THeight; x++)
             {
-                g.DrawLine(p_grid, x * CellSize, 0, x * CellSize, GuessMap.Width);
+                g.DrawLine(p_grid, x * Tsize, 0, x * Tsize, MainMap.Width);
             }
         }
 
-        private void ShipMap_Paint(object sender, PaintEventArgs e)
+        private void EnemyMap_Paint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
+
+            //Draw enemy ships on enemy grid
+                Pen p_ship = new Pen(Color.Gray);
+
+                Player tempplayer = players[1];
+
+                for (int s = 0; s < 5; s++)
+                {
+                Ship tempship = tempplayer.ships[s];
+
+                if (tempship != null)
+                {
+                    g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+                    //g.DrawImage(tempship.Sprite, tempship.X * Tsize, tempship.Y * Tsize);
+
+                    for (int part = 0; part < tempship.Size; part++)
+                    {
+                        ShipPart temppart = tempship.GetPart(part);
+                        int pX = temppart.X;
+                        int pY = temppart.Y;
+
+                        Rectangle rect = new Rectangle((pX * Tsize) + 4, (pY * Tsize + 4), Tsize - 8, Tsize - 8);
+
+                        g.DrawRectangle(p_ship, rect);
+                    }
+                }
+            }
+            
+            //Draw grid
             Pen p = new Pen(Color.Black);
 
-            int CellSize = (Tsize * Tscale)/2;
-
-            g.DrawRectangle(p, 0, 0, ShipMap.Width - 1, ShipMap.Height - 1);
+            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.None;
+            g.DrawRectangle(p, 0, 0, EnemyMap.Width - 1, EnemyMap.Height - 1);
 
             for (int y = 1; y < TWidth; y++)
             {
-                g.DrawLine(p, 0, y * CellSize, ShipMap.Height, y * CellSize);
+                g.DrawLine(p, 0, y * Tsize, EnemyMap.Height, y * Tsize);
             }
             for (int x = 1; x < THeight; x++)
             {
-                g.DrawLine(p, x * CellSize, 0, x * CellSize, ShipMap.Width);
+                g.DrawLine(p, x * Tsize, 0, x * Tsize, EnemyMap.Width);
             }
         }
     }
