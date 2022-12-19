@@ -14,7 +14,8 @@ namespace Battleship
         {
             Name = name;
             Size = size;
-            SpritePath = "C:\\Users\\alex\\OneDrive\\Documents\\Visual Studio 2022\\Battleship\\Battleship\\Assets\\"+imageName;
+
+            SpritePath = Globals.asset_directory + imageName;
         }
         public string Name { get; set; }
        
@@ -83,6 +84,23 @@ namespace Battleship
             }
 
             return false;
+        }
+        public Bitmap DrawShip()
+        {
+            Bitmap blankbit = new Bitmap(Sprite.Width, Sprite.Height);
+
+            using (Graphics g = Graphics.FromImage(blankbit))
+            {
+                g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+
+                g.TranslateTransform(16, 16);
+                g.RotateTransform(Angle * 90);
+                g.TranslateTransform(-16, -16);
+
+                g.DrawImage(Sprite, new Point(0, 0));
+            }
+
+            return blankbit;
         }
     }
     class ShipPart

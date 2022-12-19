@@ -9,3 +9,14 @@ C:\Users\alex\OneDrive\Documents\Visual Studio 2022\Battleship\Battleship\bin\De
 C:\Users\alex\OneDrive\Documents\Visual Studio 2022\Battleship\Battleship\bin\Debug\Battleship.pdb
 C:\Users\alex\OneDrive\Documents\Visual Studio 2022\Battleship\Battleship\obj\Debug\Battleship.exe
 C:\Users\alex\OneDrive\Documents\Visual Studio 2022\Battleship\Battleship\obj\Debug\Battleship.pdb
+E:\Software Development\Battleship\Battleship\bin\Debug\Battleship.exe.config
+E:\Software Development\Battleship\Battleship\bin\Debug\Battleship.exe
+E:\Software Development\Battleship\Battleship\bin\Debug\Battleship.pdb
+E:\Software Development\Battleship\Battleship\obj\Debug\Battleship.csproj.AssemblyReference.cache
+E:\Software Development\Battleship\Battleship\obj\Debug\Battleship.csproj.SuggestedBindingRedirects.cache
+E:\Software Development\Battleship\Battleship\obj\Debug\Battleship.Properties.Resources.resources
+E:\Software Development\Battleship\Battleship\obj\Debug\Battleship.csproj.GenerateResource.cache
+E:\Software Development\Battleship\Battleship\obj\Debug\Battleship.csproj.CoreCompileInputs.cache
+E:\Software Development\Battleship\Battleship\obj\Debug\Battleship.exe
+E:\Software Development\Battleship\Battleship\obj\Debug\Battleship.pdb
+E:\Software Development\Battleship\Battleship\obj\Debug\Battleship.Globals.resources

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,11 @@ using System.Windows.Forms;
 
 namespace Battleship
 {
+    static class Globals
+    {
+        public static string working_directory = Environment.CurrentDirectory;
+        public static string asset_directory = Directory.GetParent(working_directory).Parent.FullName+"\\Assets\\";
+    }
     public partial class Form1 : Form
     {
         public int Tbase = 16;
@@ -47,6 +53,10 @@ namespace Battleship
         }
         private void Form1_Load(object sender, EventArgs e)
         {
+            //Print Globals
+            Console.WriteLine("Base Directory = "+Globals.working_directory);
+            Console.WriteLine("Asset Directory = " + Globals.asset_directory);
+
             Tsize = Tbase * Tscale;
             NextStage();
 
@@ -192,8 +202,7 @@ namespace Battleship
 
                 if (tempship != null)
                 {
-                    g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
-                    //g.DrawImage(tempship.Sprite, tempship.X * Tsize, tempship.Y * Tsize);
+                    g.DrawImage(tempship.DrawShip(), tempship.X*Tsize, tempship.Y*Tsize);
 
                     for (int part = 0; part < tempship.Size; part++)
                     {
