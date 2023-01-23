@@ -27,18 +27,20 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent()
-        {
+        {        
             this.MainMap = new System.Windows.Forms.PictureBox();
             this.EnemyMap = new System.Windows.Forms.PictureBox();
             this.LabelObjective = new System.Windows.Forms.Label();
-            this.LabelInfo = new System.Windows.Forms.Label();
+            this.P1TurnLabel = new System.Windows.Forms.Label();
+            this.P2TurnLabel = new System.Windows.Forms.Label();
+            this.outcome_text = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.MainMap)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.EnemyMap)).BeginInit();
             this.SuspendLayout();
             // 
             // MainMap
             // 
-            this.MainMap.Location = new System.Drawing.Point(25, 26);
+            this.MainMap.Location = new System.Drawing.Point(24, 43);
             this.MainMap.Name = "MainMap";
             this.MainMap.Size = new System.Drawing.Size(320, 320);
             this.MainMap.TabIndex = 0;
@@ -48,11 +50,12 @@
             // 
             // EnemyMap
             // 
-            this.EnemyMap.Location = new System.Drawing.Point(418, 26);
+            this.EnemyMap.Location = new System.Drawing.Point(436, 43);
             this.EnemyMap.Name = "EnemyMap";
             this.EnemyMap.Size = new System.Drawing.Size(320, 320);
             this.EnemyMap.TabIndex = 1;
             this.EnemyMap.TabStop = false;
+            this.EnemyMap.Click += new System.EventHandler(this.EnemyMap_Click);
             this.EnemyMap.Paint += new System.Windows.Forms.PaintEventHandler(this.EnemyMap_Paint);
             // 
             // LabelObjective
@@ -62,31 +65,55 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.LabelObjective.AutoSize = true;
             this.LabelObjective.Font = new System.Drawing.Font("Stencil", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LabelObjective.Location = new System.Drawing.Point(77, 383);
+            this.LabelObjective.Location = new System.Drawing.Point(19, 378);
             this.LabelObjective.Name = "LabelObjective";
             this.LabelObjective.Size = new System.Drawing.Size(119, 25);
             this.LabelObjective.TabIndex = 2;
             this.LabelObjective.Text = "Objective";
             this.LabelObjective.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // LabelInfo
+            // P1TurnLabel
             // 
-            this.LabelInfo.AutoSize = true;
-            this.LabelInfo.Font = new System.Drawing.Font("Stencil", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LabelInfo.Location = new System.Drawing.Point(300, 387);
-            this.LabelInfo.Name = "LabelInfo";
-            this.LabelInfo.Size = new System.Drawing.Size(45, 19);
-            this.LabelInfo.TabIndex = 3;
-            this.LabelInfo.Text = "Info";
-            this.LabelInfo.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.P1TurnLabel.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.P1TurnLabel.AutoSize = true;
+            this.P1TurnLabel.Font = new System.Drawing.Font("Impact", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.P1TurnLabel.Location = new System.Drawing.Point(146, 9);
+            this.P1TurnLabel.Name = "P1TurnLabel";
+            this.P1TurnLabel.Size = new System.Drawing.Size(70, 20);
+            this.P1TurnLabel.TabIndex = 4;
+            this.P1TurnLabel.Text = "Your Turn";
+            // 
+            // P2TurnLabel
+            // 
+            this.P2TurnLabel.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.P2TurnLabel.AutoSize = true;
+            this.P2TurnLabel.Font = new System.Drawing.Font("Impact", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.P2TurnLabel.Location = new System.Drawing.Point(554, 9);
+            this.P2TurnLabel.Name = "P2TurnLabel";
+            this.P2TurnLabel.Size = new System.Drawing.Size(83, 20);
+            this.P2TurnLabel.TabIndex = 5;
+            this.P2TurnLabel.Text = "Enemy Turn";
+            // 
+            // outcome_text
+            // 
+            this.outcome_text.AutoSize = true;
+            this.outcome_text.Font = new System.Drawing.Font("Stencil", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.outcome_text.Location = new System.Drawing.Point(300, 378);
+            this.outcome_text.Name = "outcome_text";
+            this.outcome_text.Size = new System.Drawing.Size(186, 47);
+            this.outcome_text.TabIndex = 6;
+            this.outcome_text.Text = "Vic/Loss";
+            this.outcome_text.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.ClientSize = new System.Drawing.Size(785, 426);
-            this.Controls.Add(this.LabelInfo);
+            this.ClientSize = new System.Drawing.Size(785, 488);
+            this.Controls.Add(this.outcome_text);
+            this.Controls.Add(this.P2TurnLabel);
+            this.Controls.Add(this.P1TurnLabel);
             this.Controls.Add(this.LabelObjective);
             this.Controls.Add(this.EnemyMap);
             this.Controls.Add(this.MainMap);
@@ -105,7 +132,9 @@
         private System.Windows.Forms.PictureBox MainMap;
         private System.Windows.Forms.PictureBox EnemyMap;
         private System.Windows.Forms.Label LabelObjective;
-        private System.Windows.Forms.Label LabelInfo;
+        private System.Windows.Forms.Label P1TurnLabel;
+        private System.Windows.Forms.Label P2TurnLabel;
+        private System.Windows.Forms.Label outcome_text;
     }
 }
 

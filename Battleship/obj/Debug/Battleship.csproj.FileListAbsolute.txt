@@ -19,4 +19,4 @@ E:\Software Development\Battleship\Battleship\obj\Debug\Battleship.csproj.Genera
 E:\Software Development\Battleship\Battleship\obj\Debug\Battleship.csproj.CoreCompileInputs.cache
 E:\Software Development\Battleship\Battleship\obj\Debug\Battleship.exe
 E:\Software Development\Battleship\Battleship\obj\Debug\Battleship.pdb
-E:\Software Development\Battleship\Battleship\obj\Debug\Battleship.Globals.resources
+E:\Software Development\Battleship\Battleship\obj\Debug\Battleship.Form1.resources

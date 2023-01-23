@@ -12,20 +12,8 @@ using System.Windows.Forms;
 
 namespace Battleship
 {
-    static class Globals
-    {
-        public static string working_directory = Environment.CurrentDirectory;
-        public static string asset_directory = Directory.GetParent(working_directory).Parent.FullName+"\\Assets\\";
-    }
     public partial class Form1 : Form
     {
-        public int Tbase = 16;
-        public int Tscale = 2;
-        public int Tsize = 0;
-
-        static public int TWidth = 10;
-        static public int THeight = 10;
-
         public int placing_dir = 0;
 
         stages stage = stages.None;
@@ -37,8 +25,12 @@ namespace Battleship
                              new ShipData("Submarine", 3, "spr_submarine.png"),
                              new ShipData("Patrol Boat", 2, "spr_patrol.png") };
 
-        Player[] players = { new Human(TWidth, THeight), new Bot(TWidth, THeight, ref allships) };
+        Player[] players = { new Human(), new Bot(ref allships, 1) };
         int turn = 0;
+
+        Bitmap[] icons = { null, 
+                           new Bitmap(new Bitmap(Globals.asset_directory + "spr_miss.png"), 32, 32),
+                           new Bitmap(new Bitmap(Globals.asset_directory + "spr_hit.png"), 32, 32)};
 
         public Form1()
         {
@@ -56,9 +48,9 @@ namespace Battleship
             //Print Globals
             Console.WriteLine("Base Directory = "+Globals.working_directory);
             Console.WriteLine("Asset Directory = " + Globals.asset_directory);
-
-            Tsize = Tbase * Tscale;
             NextStage();
+
+            outcome_text.Text = "";
 
             /*Stages:
              * 0 = Base State
@@ -79,26 +71,36 @@ namespace Battleship
                 case stages.Place:
                     LabelObjective.Text = "Place Your Ships";
 
-                    LabelInfo.Text = "";
-
-                    for(int i=0; i<allships.Length; i++)
-                    {
-                        LabelInfo.Text += $"{allships[i].Name}\n";
-                    }
+                    P1TurnLabel.Visible = false;
+                    P2TurnLabel.Visible = false;
                     break;
                 case stages.InGame:
                     LabelObjective.Text = "Destroy the Enemy";
-                    LabelInfo.Text = "";
 
                     Bot bot = (Bot)players[1];
                     bot.PlaceShips();
+
+                    P1TurnLabel.Visible = true;
+                    P2TurnLabel.Visible = false;
+
                     Refresh();
                     break;
                 case stages.Finished:
+                    LabelObjective.Text = "";
+
+                    if (players[0].Lives > 0 && players[1].Lives == 0)
+                    {
+                        outcome_text.Text = "Victory!";
+                    }
+                    else
+                    {
+                        outcome_text.Text = "Defeat";
+                    }
+
                     break;
             }
-        }
-        private void EndTurn()
+        }       
+        public void EndTurn()
         {
             turn++;
 
@@ -106,6 +108,39 @@ namespace Battleship
             {
                 turn = 0;
             }
+
+            foreach(Player p in players)
+            {
+                p.calcLives();
+            }
+            Console.WriteLine($"P1: {players[0].Lives}      P2: {players[1].Lives}");
+
+            if (players[0].Lives == 0 || players[1].Lives == 0)
+            {
+                NextStage();
+            }
+            else
+            {
+                Console.WriteLine($"~~~~~~~~ Player {turn}'s Turn ~~~~~~~~");
+
+                if (turn == 0)
+                {
+                    P1TurnLabel.Visible = true;
+                    P2TurnLabel.Visible = false;
+                }
+                else
+                {
+                    P1TurnLabel.Visible = false;
+                    P2TurnLabel.Visible = true;
+
+                    Bot botplayer = (Bot)players[1];
+                    botplayer.TakeTurn(players[0]);
+
+                    MainMap.Refresh();
+
+                    EndTurn();
+                }
+            }           
         }
         static public Point GetDirPoints(int dir)
         {
@@ -139,8 +174,8 @@ namespace Battleship
             int MouseX = relativePoint.X - MainMap.Location.X;
             int MouseY = relativePoint.Y - MainMap.Location.Y;
 
-            int GridX = MouseX / Tsize;
-            int GridY = MouseY / Tsize;
+            int GridX = MouseX / Globals.TileSize;
+            int GridY = MouseY / Globals.TileSize;
 
             Console.WriteLine($"MX: {MouseX}\tMY: {MouseY}");
             Console.WriteLine($"GX: {GridX}\tGY: {GridY}");
@@ -193,6 +228,7 @@ namespace Battleship
 
             //Draw player ships on main grid while placing
             Pen p_ship = new Pen(Color.Gray);
+            Pen p_center = new Pen(Color.Red);
 
             Player tempplayer = players[0];
 
@@ -202,17 +238,22 @@ namespace Battleship
 
                 if (tempship != null)
                 {
-                    g.DrawImage(tempship.DrawShip(), tempship.X*Tsize, tempship.Y*Tsize);
+                    g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+                    //g.DrawImage(tempship.Sprite, tempship.TopX, tempship.TopY);
+
+                    g.DrawEllipse(p_center, tempship.TopX-3, tempship.TopY-3, 6, 6);
 
                     for (int part = 0; part < tempship.Size; part++)
                     {
                         ShipPart temppart = tempship.GetPart(part);
                         int pX = temppart.X;
                         int pY = temppart.Y;
+                        bool hit = temppart.Hit;
 
-                        Rectangle rect = new Rectangle((pX * Tsize) + 4, (pY * Tsize + 4), Tsize - 8, Tsize - 8);
+                        Rectangle rect = new Rectangle((pX * Globals.TileSize) + 4, (pY * Globals.TileSize + 4), Globals.TileSize - 8, Globals.TileSize - 8);
+                        g.DrawImage(temppart.Sprite, pX * Globals.TileSize, temppart.Y * Globals.TileSize);
 
-                        g.DrawRectangle(p_ship, rect);  
+                        g.DrawRectangle(p_ship, rect);
                     }
                 }                        
             }
@@ -223,13 +264,33 @@ namespace Battleship
 
             g.DrawRectangle(p_grid, 0, 0, MainMap.Width-1, MainMap.Height-1);
 
-            for (int y = 1; y < TWidth; y++)
+            for (int y = 1; y < Globals.MapTileWidth; y++)
             {
-                g.DrawLine(p_grid, 0, y * Tsize, MainMap.Height, y * Tsize);
+                g.DrawLine(p_grid, 0, y * Globals.TileSize, MainMap.Height, y * Globals.TileSize);
             }
-            for (int x = 1; x < THeight; x++)
+            for (int x = 1; x < Globals.MapTileHeight; x++)
             {
-                g.DrawLine(p_grid, x * Tsize, 0, x * Tsize, MainMap.Width);
+                g.DrawLine(p_grid, x * Globals.TileSize, 0, x * Globals.TileSize, MainMap.Width);
+            }
+
+            //Draw hits and misses
+            Player mainPlayer = players[1];
+            for (int yy = 0; yy < Globals.MapTileHeight; yy++)
+            {
+                for (int xx = 0; xx < Globals.MapTileWidth; xx++)
+                {
+                    guessStates tilevalue = mainPlayer.GetValue(xx, yy);
+                    Font font1 = new Font("Times New Roman", 6);
+
+                    if (tilevalue != guessStates.None)
+                    {
+                        g.DrawImage(icons[(int)tilevalue], xx * Globals.TileSize, yy * Globals.TileSize);
+                        if (Globals.DevMode)
+                        {                            
+                            g.DrawString(tilevalue.ToString(), font1, Brushes.Black, new PointF(xx * Globals.TileSize, yy * Globals.TileSize));                            
+                        }
+                    }                    
+                }
             }
         }
 
@@ -237,32 +298,38 @@ namespace Battleship
         {
             Graphics g = e.Graphics;
 
-            //Draw enemy ships on enemy grid
+                //Draw enemy ships on enemy grid
                 Pen p_ship = new Pen(Color.Gray);
+                Pen p_hit = new Pen(Color.Red);
 
                 Player tempplayer = players[1];
 
                 for (int s = 0; s < 5; s++)
                 {
-                Ship tempship = tempplayer.ships[s];
+                    Ship tempship = tempplayer.ships[s];
 
-                if (tempship != null)
-                {
-                    g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
-                    //g.DrawImage(tempship.Sprite, tempship.X * Tsize, tempship.Y * Tsize);
-
-                    for (int part = 0; part < tempship.Size; part++)
+                    if (tempship != null)
                     {
-                        ShipPart temppart = tempship.GetPart(part);
-                        int pX = temppart.X;
-                        int pY = temppart.Y;
+                        g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+                        //g.DrawImage(tempship.Sprite, tempship.X * Globals.TileSize, tempship.Y * Globals.TileSize);
 
-                        Rectangle rect = new Rectangle((pX * Tsize) + 4, (pY * Tsize + 4), Tsize - 8, Tsize - 8);
+                        for (int part = 0; part < tempship.Size; part++)
+                        {
+                            ShipPart temppart = tempship.GetPart(part);
+                            int pX = temppart.X;
+                            int pY = temppart.Y;
+                            bool hit = temppart.Hit;
 
-                        g.DrawRectangle(p_ship, rect);
+                            Rectangle rect = new Rectangle((pX * Globals.TileSize) + 4, (pY * Globals.TileSize + 4), Globals.TileSize - 8, Globals.TileSize - 8);
+
+                            if (!hit && Globals.DevMode)
+                            {
+                                g.DrawRectangle(p_ship, rect);
+                            }                           
+                        }
                     }
                 }
-            }
+                       
             
             //Draw grid
             Pen p = new Pen(Color.Black);
@@ -270,14 +337,114 @@ namespace Battleship
             g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.None;
             g.DrawRectangle(p, 0, 0, EnemyMap.Width - 1, EnemyMap.Height - 1);
 
-            for (int y = 1; y < TWidth; y++)
+            for (int y = 1; y < Globals.MapTileWidth; y++)
             {
-                g.DrawLine(p, 0, y * Tsize, EnemyMap.Height, y * Tsize);
+                g.DrawLine(p, 0, y * Globals.TileSize, EnemyMap.Height, y * Globals.TileSize);
             }
-            for (int x = 1; x < THeight; x++)
+            for (int x = 1; x < Globals.MapTileHeight; x++)
             {
-                g.DrawLine(p, x * Tsize, 0, x * Tsize, EnemyMap.Width);
+                g.DrawLine(p, x * Globals.TileSize, 0, x * Globals.TileSize, EnemyMap.Width);
+            }
+
+            //Draw hits and misses
+            Player mainPlayer = players[0];
+            for (int yy = 0; yy < Globals.MapTileHeight; yy++)
+            {
+                for (int xx = 0; xx < Globals.MapTileWidth; xx++)
+                {
+                    guessStates tilevalue = mainPlayer.GetValue(xx, yy);
+                    Font font1 = new Font("Times New Roman", 6);
+
+                    if (tilevalue != guessStates.None)
+                    {
+                        g.DrawImage(icons[(int)tilevalue], xx * Globals.TileSize, yy * Globals.TileSize);
+                        if (Globals.DevMode)
+                        {
+                            g.DrawString(tilevalue.ToString(), font1, Brushes.Black, new PointF(xx * Globals.TileSize, yy * Globals.TileSize));                           
+                        }                       
+                    }                    
+                }
             }
         }
+
+        private void EnemyMap_Click(object sender, EventArgs e)
+        {
+            MouseEventArgs me = (MouseEventArgs)e;
+
+            var relativePoint = PointToClient(Cursor.Position);
+
+            int RawMouseX = relativePoint.X;
+            int RawMouseY = relativePoint.Y;
+
+            int MouseX = RawMouseX - EnemyMap.Location.X;
+            int MouseY = RawMouseY - EnemyMap.Location.Y;
+
+            int GridX = MouseX / Globals.TileSize;
+            int GridY = MouseY / Globals.TileSize;
+
+            Console.WriteLine($"RX: {RawMouseX}\tRY: {RawMouseY}");
+            Console.WriteLine($"MX: {MouseX}\tMY: {MouseY}");
+            Console.WriteLine($"GX: {GridX}\tGY: {GridY}");
+
+            if (stage == stages.InGame)
+            {
+                if (turn == 0)
+                {
+                    if (me.Button == MouseButtons.Left)
+                    {
+                        guessStates tile = players[0].GetValue(GridX, GridY);
+
+                        if (tile == guessStates.None)
+                        {
+                            guessStates result = players[1].GetAttacked(GridX, GridY);
+
+                            players[0].SetGuess(GridX, GridY, result);
+
+                            EnemyMap.Refresh();
+
+                            EndTurn();
+                        }                      
+                    }
+                }
+            }
+        }
+    }
+    static class Globals
+    {
+        public static string working_directory = Environment.CurrentDirectory;
+        public static string asset_directory = Directory.GetParent(working_directory).Parent.FullName + "\\Assets\\";
+        public static int TileSize = 32;
+        public static int MapTileWidth = 10;
+        public static int MapTileHeight = 10;
+        public static bool DevMode = false;
+
+        public static void wait(int milliseconds)
+        {
+            var timer1 = new System.Windows.Forms.Timer();
+            if (milliseconds == 0 || milliseconds < 0) return;
+
+            // Console.WriteLine("start wait timer");
+            timer1.Interval = milliseconds;
+            timer1.Enabled = true;
+            timer1.Start();
+
+            timer1.Tick += (s, e) =>
+            {
+                timer1.Enabled = false;
+                timer1.Stop();
+                // Console.WriteLine("stop wait timer");
+            };
+
+            while (timer1.Enabled)
+            {
+                Application.DoEvents();
+            }
+        }
+    }
+    public enum guessStates
+    {
+        None = 0,
+        Miss,
+        Hit
     }
 }
