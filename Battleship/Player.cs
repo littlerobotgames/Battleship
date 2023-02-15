@@ -159,12 +159,12 @@ namespace Battleship
     {
         private ShipData[] allships;
         private Random ran = new Random();
-        public Bot(ref ShipData[] all, int l)
+        public Bot(ref ShipData[] all, BotLevel lvl)
         {
             allships = all;
-            Level = l;
+            Level = lvl;
         }
-        public int Level { get; set; }
+        public BotLevel Level { get; set; }
         public Point GetDirPoints(int dir)
         {
             Point p;
@@ -227,7 +227,7 @@ namespace Battleship
         }
         public void TakeTurn(Player enemy)
         {
-            Globals.wait(1000);
+            int think_time = 0;
 
             int ranX = 0, ranY = 0;
             guessStates tile;
@@ -236,7 +236,7 @@ namespace Battleship
 
             switch (Level)
             {
-                case 0:
+                case BotLevel.Easy:
                     //Easy Bot
 
                     //Find random unpicked tile
@@ -245,9 +245,10 @@ namespace Battleship
                         ranX = ran.Next(0, 10);
                         ranY = ran.Next(0, 10);
                         tile = guesses[ranX, ranY];
+                        think_time++;
                     } while (tile != guessStates.None);
                     break;
-                case 1:
+                case BotLevel.Medium:
                     //Medium Bot
 
                     //Get list of hits on the map
@@ -265,6 +266,8 @@ namespace Battleship
                                     //Add to list if there are guessable tiles around it
                                     Console.WriteLine($"Found an available hit at ({xx}, {yy})");
                                     hit_points.Add(new Point(xx, yy));
+
+                                    think_time++;
                                 }                               
                             }
                         }
@@ -302,6 +305,7 @@ namespace Battleship
                                     if (checkX>=0 && checkX<10 && checkY>=0 && checkY < 10)
                                     {
                                         checkTile = guesses[checkX, checkY];
+                                        think_time++;
                                     }
                                     else
                                     {
@@ -325,16 +329,19 @@ namespace Battleship
                             ranX = ran.Next(0, 10);
                             ranY = ran.Next(0, 10);
                             tile = guesses[ranX, ranY];
+                            think_time++;
                         } while (tile != guessStates.None);
                     }
 
                     
                     break;
-                case 2:
+                case BotLevel.Hard:
                     //Hard Bot
                     break;
             }
-            
+
+            Globals.wait(think_time * 150);
+
             //2. Attack that tile
             guessStates result = enemy.GetAttacked(ranX, ranY);
             SetGuess(ranX, ranY, result);

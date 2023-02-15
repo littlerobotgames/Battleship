@@ -34,6 +34,7 @@
             this.P1TurnLabel = new System.Windows.Forms.Label();
             this.P2TurnLabel = new System.Windows.Forms.Label();
             this.outcome_text = new System.Windows.Forms.Label();
+            this.button_again = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.MainMap)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.EnemyMap)).BeginInit();
             this.SuspendLayout();
@@ -47,6 +48,7 @@
             this.MainMap.TabStop = false;
             this.MainMap.Click += new System.EventHandler(this.MainMap_Click);
             this.MainMap.Paint += new System.Windows.Forms.PaintEventHandler(this.MainMap_Paint);
+            this.MainMap.MouseMove += new System.Windows.Forms.MouseEventHandler(this.MainMap_mouseMove);
             // 
             // EnemyMap
             // 
@@ -105,12 +107,24 @@
             this.outcome_text.Text = "Vic/Loss";
             this.outcome_text.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // button_again
+            // 
+            this.button_again.Font = new System.Drawing.Font("Stencil", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button_again.Location = new System.Drawing.Point(308, 428);
+            this.button_again.Name = "button_again";
+            this.button_again.Size = new System.Drawing.Size(178, 29);
+            this.button_again.TabIndex = 7;
+            this.button_again.Text = "Play Again?";
+            this.button_again.UseVisualStyleBackColor = true;
+            this.button_again.Click += new System.EventHandler(this.button_again_clicked);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.ClientSize = new System.Drawing.Size(785, 488);
+            this.Controls.Add(this.button_again);
             this.Controls.Add(this.outcome_text);
             this.Controls.Add(this.P2TurnLabel);
             this.Controls.Add(this.P1TurnLabel);
@@ -135,6 +149,7 @@
         private System.Windows.Forms.Label P1TurnLabel;
         private System.Windows.Forms.Label P2TurnLabel;
         private System.Windows.Forms.Label outcome_text;
+        private System.Windows.Forms.Button button_again;
     }
 }
 

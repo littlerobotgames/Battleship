@@ -134,20 +134,23 @@ namespace Battleship
         {
             Bitmap rotated = new Bitmap(ori.Width, ori.Height);
 
-            using (Graphics g = Graphics.FromImage(rotated))
-            {
-                g.TranslateTransform(ori.Width/2, ori.Height/2);
-                g.RotateTransform(angle * 90);
-                g.TranslateTransform(- ori.Width/2, - ori.Height/2);
+            Graphics g = Graphics.FromImage(rotated);
+            
+            g.TranslateTransform((float)rotated.Width/2, (float)rotated.Height/2);
 
-                g.DrawImage(ori, new Point(0, 0));
-            }
+            g.RotateTransform(angle * -90);
+
+            g.TranslateTransform(-(float)rotated.Width / 2, -(float)rotated.Height / 2);
+
+            g.DrawImage(ori, new Point(0, 0));
+
+            g.Dispose();
 
             return rotated;
         }
         public Bitmap GetSpritePart(int part, Bitmap src)
         {
-            Bitmap dest = new Bitmap(src.Width, src.Height);
+            Bitmap dest = new Bitmap(32, 32);
 
             using(Graphics g = Graphics.FromImage(dest))
             {
